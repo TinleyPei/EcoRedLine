@@ -72,9 +72,9 @@ namespace EcoRedLine
 
         public void OnClick()
         {
-            System.Windows.Forms.MessageBox.Show("正在开发中！");
-            //pfrmBiodiversity = new frmBiodiversity();
-            //pfrmBiodiversity.ShowDialog();
+            //System.Windows.Forms.MessageBox.Show("正在开发中！");
+            pfrmBiodiversity = new frmBiodiversity();
+            pfrmBiodiversity.ShowDialog();
         }
 
         public void OnCreate(IApplication hook)
