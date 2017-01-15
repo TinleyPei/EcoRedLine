@@ -223,7 +223,11 @@ namespace EcoRedLine
                 rc.expression = " 1 + " + "(\"" + w + "\" *  \"" + pet + "\" / (\"" + tb_raininput.Text + "\") + \"" + tb_raininput.Text + "\" / \"" + pet + "\")";
                 rc.output_raster = et2_t;
                 gp.Execute(rc, null);
+<<<<<<< HEAD
                 rc.expression = "Con(\"" + et2_t + "\"" + " != 0 ,\"" + et2_t + "\")";
+=======
+                rc.expression = "\"" + et2_t + "\"" + " != 0";
+>>>>>>> origin/master
                 rc.output_raster = et2;
                 gp.Execute(rc, null);
                 rc.expression = "\"" + et1 + "\" / \"" + et2 + "\"";
@@ -257,6 +261,7 @@ namespace EcoRedLine
                 }
 
 
+<<<<<<< HEAD
                 //IMapDocument pMapDocument = new MapDocumentClass();
                 //pMapDocument.Open("模板地形地貌.mxd"); //打开本地的“模板地形地貌.mxd”地图文档，用来操作改mxd文件
                 //IMap pMap = pMapDocument.get_Map(0);
@@ -274,6 +279,8 @@ namespace EcoRedLine
 
 
 
+=======
+>>>>>>> origin/master
             }
             catch (Exception ex)
             {

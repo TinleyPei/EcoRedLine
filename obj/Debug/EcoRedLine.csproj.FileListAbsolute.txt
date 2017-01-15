@@ -54,6 +54,7 @@ C:\Users\41866\Desktop\EcoRedLine\obj\Debug\EcoRedLine.dll
 C:\Users\41866\Desktop\EcoRedLine\obj\Debug\EcoRedLine.pdb
 C:\Users\41866\Desktop\EcoRedLine\obj\Debug\EcoRedLine.csprojResolveAssemblyReference.cache
 C:\Users\41866\Desktop\EcoRedLine\obj\Debug\EcoRedLine.Properties.Resources.resources
+<<<<<<< HEAD
 C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.frmBiodiversity.resources
 C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.frmFlood.resources
 C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.frmGeoHazards.resources
@@ -66,3 +67,5 @@ C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Deb
 C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\bin\Debug\EcoRedLine.dll
 C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\bin\Debug\EcoRedLine.pdb
 C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.pdb
+=======
+>>>>>>> origin/master
