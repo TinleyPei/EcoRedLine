@@ -81,10 +81,10 @@
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.txtOutput);
             this.groupBox1.Controls.Add(this.groupBox4);
-            this.groupBox1.Location = new System.Drawing.Point(0, 0);
+            this.groupBox1.Location = new System.Drawing.Point(1, 1);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(755, 464);
-            this.groupBox1.TabIndex = 9;
+            this.groupBox1.Size = new System.Drawing.Size(749, 464);
+            this.groupBox1.TabIndex = 10;
             this.groupBox1.TabStop = false;
             // 
             // groupBox6
@@ -387,7 +387,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.LightGray;
-            this.ClientSize = new System.Drawing.Size(755, 465);
+            this.ClientSize = new System.Drawing.Size(750, 462);
             this.Controls.Add(this.groupBox1);
             this.DoubleBuffered = true;
             this.Name = "frmTerrain";

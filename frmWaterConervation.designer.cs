@@ -75,7 +75,7 @@
             this.tb_state.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tb_state.Font = new System.Drawing.Font("宋体", 9F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.tb_state.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.tb_state.Location = new System.Drawing.Point(2, 606);
+            this.tb_state.Location = new System.Drawing.Point(2, 589);
             this.tb_state.Name = "tb_state";
             this.tb_state.Size = new System.Drawing.Size(369, 14);
             this.tb_state.TabIndex = 31;
@@ -343,7 +343,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(656, 623);
+            this.ClientSize = new System.Drawing.Size(656, 603);
             this.Controls.Add(this.tb_state);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.bt_cancel);
@@ -357,7 +357,6 @@
             this.Name = "frmWaterConervation";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "水源涵养生态红线";
-            this.Load += new System.EventHandler(this.frmWaterConervation_Load);
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();

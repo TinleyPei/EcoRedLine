@@ -24,7 +24,6 @@ namespace EcoRedLine
 {
     public partial class frmTerrain : DevComponents.DotNetBar.OfficeForm
     {
-
         private IPageLayoutControl _PageLayoutControl = null;
         public frmTerrain()
         {
@@ -53,9 +52,6 @@ namespace EcoRedLine
         {
             
         }
-
-        
-      
 
         private void btInput_Click(object sender, EventArgs e)
         {
@@ -89,7 +85,7 @@ namespace EcoRedLine
 
         private void btOk_Click(object sender, EventArgs e)
         {
-            this.rtxtState.AppendText("正在执行，请您耐心等待...\n");
+             this.rtxtState.AppendText("正在执行，请您耐心等待...\n");
             this.rtxtState.ScrollToCaret();
             #region 步骤一：接收输入数据的路径
             string sInputFile = this.txtInput.Text;
@@ -191,6 +187,9 @@ namespace EcoRedLine
             IRasterLayer pRasterLayer = new RasterLayerClass();
             IWorkspaceFactory rasterWorkspaceFactory = new RasterWorkspaceFactoryClass();
             IRasterWorkspace rasterWorkspace = (IRasterWorkspace)rasterWorkspaceFactory.OpenFromFile(txtOutput.Text, 0);
+
+
+
             IRasterDataset pRasterDataset1 = rasterWorkspace.OpenRasterDataset("优化建设区.tif");  //打开"优化建设区.tif"为栅格图的文件名
             pRasterLayer.CreateFromDataset(pRasterDataset1);    //创建    
             pRasterLayer = pMapLayer.get_Layer(1) as IRasterLayer;
@@ -216,6 +215,8 @@ namespace EcoRedLine
             pRasterLayer4.CreateFromDataset(pRasterDataset4);    //创建    
             pRasterLayer4 = pMapLayer.get_Layer(4) as IRasterLayer;
             pRasterLayer4.CreateFromDataset(pRasterDataset4);
+
+
             pMapDocument.Save(true, true);//保存更改完路径后的mxd文件模板地形地貌2
 
             //string fileName = "南湖村.mxd";// @"C:\Users\tangmeng\Desktop\农用地籍数据库\实验四\南湖数据\南湖村.mxd";
@@ -235,11 +236,16 @@ namespace EcoRedLine
 
             this.rtxtState.AppendText("地图输出完成...\n");
             this.rtxtState.ScrollToCaret();
+        
         }
 
         private void btCancel_Click(object sender, EventArgs e)
         {
             this.Close();
         }
+
+       
+       
+       
     }
 }

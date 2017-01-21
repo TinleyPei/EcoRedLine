@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MyPluginEngine;
+using ESRI.ArcGIS.Controls;
 
 namespace EcoRedLine
 {
@@ -12,6 +13,7 @@ namespace EcoRedLine
     {
         private MyPluginEngine.IApplication hk;
         private System.Drawing.Bitmap m_hBitmap;
+        private IPageLayoutControl _PageLayoutControl = null;//定义IPageLayoutControl，为空值
         private ESRI.ArcGIS.SystemUI.ICommand cmd = null;
         frmFlood pfrmFlood;
 
@@ -73,7 +75,7 @@ namespace EcoRedLine
         public void OnClick()
         {
             //System.Windows.Forms.MessageBox.Show("正在开发中！");
-            pfrmFlood = new frmFlood();
+            pfrmFlood = new frmFlood(_PageLayoutControl);
             pfrmFlood.ShowDialog();
         }
 
@@ -82,7 +84,8 @@ namespace EcoRedLine
             if (hook != null)
             {
                 this.hk = hook;
-                pfrmFlood = new frmFlood();
+                this._PageLayoutControl = hk.PageLayoutControl as IPageLayoutControl;
+                pfrmFlood = new frmFlood(_PageLayoutControl);
                 pfrmFlood.Visible = false;
             }
         }

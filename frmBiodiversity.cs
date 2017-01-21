@@ -1,4 +1,8 @@
-﻿using ESRI.ArcGIS.esriSystem;
+﻿using ESRI.ArcGIS.Carto;
+using ESRI.ArcGIS.Controls;
+using ESRI.ArcGIS.DataSourcesRaster;
+using ESRI.ArcGIS.esriSystem;
+using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.Geoprocessing;
 using ESRI.ArcGIS.Geoprocessor;
 using System;
@@ -15,9 +19,13 @@ namespace EcoRedLine
 {
     public partial class frmBiodiversity : DevComponents.DotNetBar.OfficeForm
     {
-        public frmBiodiversity()
+        private IPageLayoutControl _PageLayoutControl = null;
+
+        public frmBiodiversity(IPageLayoutControl pPageLayoutControl)
         {
             InitializeComponent();
+            this._PageLayoutControl = pPageLayoutControl;
+
             //禁用Glass主题
             this.EnableGlass = false;
             //不显示最大化最小化按钮
@@ -27,11 +35,11 @@ namespace EcoRedLine
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             //去除图标
             this.ShowIcon = false;
-            tb_nppinput.Text = "C:\\Users\\41866\\Desktop\\云南系统\\test\\sun.tif";
-            tb_preinput.Text = "C:\\Users\\41866\\Desktop\\云南系统\\test\\rain.tif";
-            tb_tminput.Text = "C:\\Users\\41866\\Desktop\\云南系统\\test\\ta_Resample.tif";
-            tb_altinput.Text = "C:\\Users\\41866\\Desktop\\云南系统\\test\\dem.tif";
-            tb_biooutput.Text = "C:\\Users\\41866\\Desktop\\云南系统\\test\\Biodiversity.tif";
+            tb_nppinput.Text = System.Environment.CurrentDirectory + "\\Data\\EcoRedLine\\sun.tif";
+            tb_preinput.Text = System.Environment.CurrentDirectory + "\\Data\\EcoRedLine\\rain.tif";
+            tb_tminput.Text = System.Environment.CurrentDirectory + "\\Data\\EcoRedLine\\ta_Resample.tif";
+            tb_altinput.Text = System.Environment.CurrentDirectory + "\\Data\\EcoRedLine\\dem.tif";
+            tb_biooutput.Text = System.Environment.CurrentDirectory + "\\Data\\EcoRedLine\\Biodiversity.tif";
         }
 
         private void bt_nppinput_Click(object sender, EventArgs e)
@@ -130,6 +138,40 @@ namespace EcoRedLine
 
         private void bt_ok_Click(object sender, EventArgs e)
         {
+
+            //判断输入路径是否正确
+            #region
+            try
+            {
+                if (!File.Exists(tb_nppinput.Text))
+                {
+                    MessageBox.Show("生态系统净初级生产力平均值数据输入路径不正确或文件被占用，请重新输入路径！", "提示", MessageBoxButtons.OK);
+                    return;
+                }
+                if (!File.Exists(tb_preinput.Text))
+                {
+                    MessageBox.Show("平均年降水量数据输入路径不正确或文件被占用，请重新输入路径！", "提示", MessageBoxButtons.OK);
+                    return;
+                }
+                if (!File.Exists(tb_tminput.Text))
+                {
+                    MessageBox.Show("平均温度数据输入路径不正确或文件被占用，请重新输入路径！", "提示", MessageBoxButtons.OK);
+                    return;
+                }
+                if (!File.Exists(tb_altinput.Text))
+                {
+                    MessageBox.Show("海拔参数数据输入路径不正确或文件被占用，请重新输入路径！", "提示", MessageBoxButtons.OK);
+                    return;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("设置路径不合法，请检查！");
+                return;
+            }
+            #endregion
+            object sev = null;
             tb_state.Text = "正在处理……";
             ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator rc = new ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator();
             ESRI.ArcGIS.SpatialAnalystTools.Float tofloat = new ESRI.ArcGIS.SpatialAnalystTools.Float();
@@ -224,10 +266,36 @@ namespace EcoRedLine
                     }
                 }
 
+
+
+                //将结果加载显示
+                #region
+                string mxfile = System.Environment.CurrentDirectory + "\\Data\\EcoRedLine\\生物多样性生态红线划分.mxd";
+                IMapDocument pMapDocument = new MapDocumentClass();
+                pMapDocument.Open(mxfile); //打开本地的地图文档，用来操作改mxd文件
+                IMap pMap = pMapDocument.get_Map(0);
+                IMapLayers pMapLayer = pMap as IMapLayers;
+                IRasterLayer pRasterLayer = new RasterLayerClass();
+                IWorkspaceFactory rasterWorkspaceFactory = new RasterWorkspaceFactoryClass();
+                IRasterWorkspace rasterWorkspace = (IRasterWorkspace)rasterWorkspaceFactory.OpenFromFile(System.IO.Path.GetDirectoryName(tb_biooutput.Text), 0);
+                IRasterDataset pRasterDataset1 = rasterWorkspace.OpenRasterDataset("Biodiversity.tif");  //打开栅格图的文件名
+                pRasterLayer.CreateFromDataset(pRasterDataset1);    //创建    
+                pRasterLayer = pMapLayer.get_Layer(0) as IRasterLayer;
+                pRasterLayer.CreateFromDataset(pRasterDataset1);
+                pMapDocument.Save(true, true);//保存更改完路径后的mxd文件
+
+                _PageLayoutControl.LoadMxFile(mxfile);
+                _PageLayoutControl.Extent = _PageLayoutControl.FullExtent;
+                _PageLayoutControl.ZoomToWholePage();
+
+
+                #endregion
+
+
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "提示", MessageBoxButtons.OK);
+                MessageBox.Show(gp.GetMessages(ref sev), "提示", MessageBoxButtons.OK);
             }
 
 

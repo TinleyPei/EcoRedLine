@@ -16,426 +16,503 @@ using ESRI.ArcGIS.Geometry;
 using ESRI.ArcGIS.SpatialAnalyst;
 
 using CommandLibrary;
+using ESRI.ArcGIS.Geoprocessing;
+using ESRI.ArcGIS.esriSystem;
+using ESRI.ArcGIS.Geoprocessor;
+using System.IO;
 
 namespace EcoRedLine
 {
     public partial class frmWaterSoilConservation : DevComponents.DotNetBar.OfficeForm
     {
-        private IMap pMap = null;
-        IMapAlgebraOp pMapAlgebraOp = new RasterMapAlgebraOpClass();
 
-        private List<IGeoDataset> listRasterDataset = new List<IGeoDataset>();
-
-        public frmWaterSoilConservation()
+        //临时文件夹
+        string Temfile = @"C:\DaliTemfile";
+        private IPageLayoutControl _PageLayoutControl = null;
+        public frmWaterSoilConservation(IPageLayoutControl pPageLayoutControl)
         {
             InitializeComponent();
-
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
-        }
-
-        public frmWaterSoilConservation(IMap _pMap)
-        {
-            InitializeComponent();
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
-
-            if (_pMap != null)
-            {
-                pMap = _pMap;
-            }
+            this._PageLayoutControl = pPageLayoutControl;
            
-            //禁用Glass主题
-            this.EnableGlass = false;
-            //不显示最大化最小化按钮
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            //
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            //去除图标
-            this.ShowIcon = false;
         }
+        //1计算参数R中的变量
+        string sR = null;
+        string strExp = "";
+        string sR2 = null;
+        string sR3 = null;
+        //2计算参数K中的变量
+        string sK;
+        string sfcsand;
+        string sfcisi;
+        string sfargc;
+        string sfhisand;
+        string CalKpath = null;
+        //3计算参数LS中的变量
+        string sS;
+        string sM;
+        string sLs;
+        string Calspath = null;
+        string Calmpath = null;
+        string Callspath = null;
+        string FlowAcc = null;
+        //4计算参数C中的变量
+        string sC;
+        string CalCpath;
+        //5计算P参数中的变量
+        string sP;
+        //最后计算A
+        string sA;
+        
 
         private void frmSoilRunOffSpatial_Load(object sender, EventArgs e)
         {
-            addRasterLayerToCombobox();
+            
         }
 
-        private void addRasterLayerToCombobox()
+        private void btnR_Click(object sender, EventArgs e)
         {
-            try
+            OpenFileDialog dlg = new OpenFileDialog();
+
+            //过滤选择数据类型为.shp,其中：*.*代表全部文件，如果多个扩展名并列，用“|”隔开
+            dlg.Filter = "tiff(*.tif)|*.tif";
+
+
+            //获取窗口对象中的文件路径，并将文件路径字符串赋值给文本框txt_InputShp
+            //this.txt_Input.Text = dlg.FileName;
+            if (dlg.ShowDialog() == DialogResult.OK)
             {
-                ILayer pLayer = null;
+                this.txtR.Text = dlg.FileName;
+            }
+        }
+        string filePath_temp;//路径存储中间量
+        private void btnOpenPcp_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();//选择存储文件
+            folderBrowserDialog1.Description = "请选择文件夹";
+            folderBrowserDialog1.ShowNewFolderButton = true;
+            folderBrowserDialog1.RootFolder = Environment.SpecialFolder.Desktop;
+            System.Windows.Forms.DialogResult result = folderBrowserDialog1.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                filePath_temp = folderBrowserDialog1.SelectedPath;
+            }
+            txtPcpPath.Text = filePath_temp;
+        }
 
-                for (int index = 0; index < this.pMap.LayerCount; index++)
+        private void btnYear_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+
+            //过滤选择数据类型为.shp,其中：*.*代表全部文件，如果多个扩展名并列，用“|”隔开
+            dlg.Filter = "tiff(*.tif)|*.tif";
+
+
+            //获取窗口对象中的文件路径，并将文件路径字符串赋值给文本框txt_InputShp
+            //this.txt_Input.Text = dlg.FileName;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                this.txtYear.Text = dlg.FileName;
+            }
+        }
+
+        private void btSoilClay_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+
+            //过滤选择数据类型为.shp,其中：*.*代表全部文件，如果多个扩展名并列，用“|”隔开
+            dlg.Filter = "tiff(*.tif)|*.tif";
+
+
+            //获取窗口对象中的文件路径，并将文件路径字符串赋值给文本框txt_InputShp
+            //this.txt_Input.Text = dlg.FileName;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                this.txtSoilClay.Text = dlg.FileName;
+            }
+        }
+
+        private void btSoilSlit_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+
+            //过滤选择数据类型为.shp,其中：*.*代表全部文件，如果多个扩展名并列，用“|”隔开
+            dlg.Filter = "tiff(*.tif)|*.tif";
+
+
+            //获取窗口对象中的文件路径，并将文件路径字符串赋值给文本框txt_InputShp
+            //this.txt_Input.Text = dlg.FileName;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                this.txtSoilSlit.Text = dlg.FileName;
+            }
+        }
+
+        private void btSoilSand_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+
+            //过滤选择数据类型为.shp,其中：*.*代表全部文件，如果多个扩展名并列，用“|”隔开
+            dlg.Filter = "tiff(*.tif)|*.tif";
+
+
+            //获取窗口对象中的文件路径，并将文件路径字符串赋值给文本框txt_InputShp
+            //this.txt_Input.Text = dlg.FileName;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                this.txtSoilSand.Text = dlg.FileName;
+            }
+        }
+
+        private void btSoilOrganic_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+
+            //过滤选择数据类型为.shp,其中：*.*代表全部文件，如果多个扩展名并列，用“|”隔开
+            dlg.Filter = "tiff(*.tif)|*.tif";
+
+
+            //获取窗口对象中的文件路径，并将文件路径字符串赋值给文本框txt_InputShp
+            //this.txt_Input.Text = dlg.FileName;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                this.txtSoilOrganic.Text = dlg.FileName;
+            }
+        }
+
+        private void btDem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+
+            //过滤选择数据类型为.shp,其中：*.*代表全部文件，如果多个扩展名并列，用“|”隔开
+            dlg.Filter = "tiff(*.tif)|*.tif";
+
+
+            //获取窗口对象中的文件路径，并将文件路径字符串赋值给文本框txt_InputShp
+            //this.txt_Input.Text = dlg.FileName;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                this.txtDem.Text = dlg.FileName;
+            }
+        }
+
+        private void btC_Click(object sender, EventArgs e)
+        {
+
+            OpenFileDialog dlg = new OpenFileDialog();
+
+            //过滤选择数据类型为.shp,其中：*.*代表全部文件，如果多个扩展名并列，用“|”隔开
+            dlg.Filter = "tiff(*.tif)|*.tif";
+
+
+            //获取窗口对象中的文件路径，并将文件路径字符串赋值给文本框txt_InputShp
+            //this.txt_Input.Text = dlg.FileName;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                this.txtC.Text = dlg.FileName;
+            }
+        }
+
+        private void btP_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+
+            //过滤选择数据类型为.shp,其中：*.*代表全部文件，如果多个扩展名并列，用“|”隔开
+            dlg.Filter = "tiff(*.tif)|*.tif";
+
+
+            //获取窗口对象中的文件路径，并将文件路径字符串赋值给文本框txt_InputShp
+            //this.txt_Input.Text = dlg.FileName;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                this.txtP.Text = dlg.FileName;
+            }
+        }
+
+        private void btnOK_Click(object sender, EventArgs e)
+        {
+            if (txtSoilClay.Text.Equals(""))
+            {
+                MessageBox.Show("请选择输入土壤黏粒含量(%)数据！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (txtSoilSlit.Text.Equals(""))
+            {
+                MessageBox.Show("请选择输入土壤粉粒含量(%)数据！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (txtSoilSand.Text.Equals(""))
+            {
+                MessageBox.Show("请选择输入土壤砂粒含量(%)数据！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (txtSoilOrganic.Text.Equals(""))
+            {
+                MessageBox.Show("请选择输入土壤有机物含量(%)数据！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (txtDem.Text.Equals(""))
+            {
+                MessageBox.Show("请选择输入DEM数据！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (txtC.Text.Equals(""))
+            {
+                MessageBox.Show("请选择输入地表覆被因子相关数据！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (txtP.Text.Equals(""))
+            {
+                MessageBox.Show("请选择输入水土保持措施因子数据！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (txtSavePath.Text.Equals(""))
+            {
+                MessageBox.Show("请选择结果输出路径！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (rbtnR.Checked && txtR.Text.Equals(""))
+            {
+                MessageBox.Show("请选择输入降雨侵蚀力因子R相关数据！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if ((!rbtnR.Checked) && txtPcpPath.Text.Equals(""))
+            {
+                MessageBox.Show("请选择输入多年平均各月降雨量数据所在路径！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if ((!rbtnR.Checked) && txtPcpPrefix.Text.Equals(""))
+            {
+                MessageBox.Show("请输入数据前缀(如：pcp_*)！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if ((!rbtnR.Checked) && txtPcpSuffix.Text.Equals(""))
+            {
+                MessageBox.Show("请输入数据后缀(如：tif)！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if ((!rbtnR.Checked) && txtYear.Text.Equals(""))
+            {
+                MessageBox.Show("请输入年平均降水量！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            //现创建一个存放临时文件的临时文件夹
+            string newPath = System.IO.Path.Combine(Temfile, "");
+            System.IO.Directory.CreateDirectory(newPath);
+
+            this.rtxtState.AppendText("正在执行，请您耐心等待...\n");
+            this.rtxtState.ScrollToCaret();
+            this.rtxtState.AppendText("开始准备配置文件...\n");
+            this.rtxtState.ScrollToCaret();
+            IVariantArray parameters = new VarArrayClass();
+            Geoprocessor GP = new Geoprocessor();
+            this.rtxtState.AppendText("准备调用GP工具箱...\n");
+            this.rtxtState.ScrollToCaret();
+            //ESRI.ArcGIS.DataManagementTools.GetRasterProperties NDVIMin = new ESRI.ArcGIS.DataManagementTools.GetRasterProperties();
+            //ESRI.ArcGIS.DataManagementTools.GetRasterProperties NDVIMax = new ESRI.ArcGIS.DataManagementTools.GetRasterProperties();
+            ESRI.ArcGIS.SpatialAnalystTools.Slope slo = new ESRI.ArcGIS.SpatialAnalystTools.Slope();//计算坡度
+            ESRI.ArcGIS.SpatialAnalystTools.Fill demFill = new ESRI.ArcGIS.SpatialAnalystTools.Fill();
+            ESRI.ArcGIS.SpatialAnalystTools.FlowDirection Filldec = new ESRI.ArcGIS.SpatialAnalystTools.FlowDirection();
+            ESRI.ArcGIS.SpatialAnalystTools.FlowAccumulation DecAcc = new ESRI.ArcGIS.SpatialAnalystTools.FlowAccumulation();
+            ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator sCals = new ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator();
+            ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator sCalm = new ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator();
+            ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator sCalLS = new ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator();
+            ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator sCalR = new ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator();
+            ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator sCalK = new ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator();
+            ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator sCalA = new ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator();
+            ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator sCalC = new ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator();
+            //1计算参数R
+
+            if (rbtnR.Checked)
+            {
+                sR = txtR.Text;
+                this.rtxtState.AppendText("降水侵蚀因子R读取成功，准备计算参数K...\n");
+                this.rtxtState.ScrollToCaret();
+
+            }
+            else
+            {
+                this.rtxtState.AppendText("开始计算参数R...\n");
+                this.rtxtState.ScrollToCaret();
+                string sFileName = "";
+                string sYear = txtYear.Text;
+                for (int i = 1; i < 13; i++)
                 {
-                    pLayer = this.pMap.get_Layer(index);
-                    if (pLayer is IRasterLayer)
+                    sFileName = txtPcpPath.Text + "\\" + this.txtPcpPrefix.Text + i.ToString() + "." + this.txtPcpSuffix.Text;
+                    strExp = "(1.735 * Power(10,1.5 * Log10((" + "\"" + sFileName + "\"" + " * " + "\"" + sFileName + "\"" + ") /" + "\"" + txtYear.Text + "\")" + " - 0.08188))";
+                    if (i < 12)
                     {
-                        IRasterLayer pRastetLayer = pLayer as IRasterLayer;
-                        IRasterBandCollection pRasterBandColection = pRastetLayer.Raster as IRasterBandCollection;
-                        if (pRasterBandColection.Count == 1)
-                        {
-                            listRasterDataset.Add((IGeoDataset)pRasterBandColection.Item(0).RasterDataset);
-                            this.cmbR.Items.Add(pLayer.Name);
-
-                            this.cmbSoilClay.Items.Add(pLayer.Name);
-                            this.cmbSoilSand.Items.Add(pLayer.Name);
-                            this.cmbSoilSlit.Items.Add(pLayer.Name);
-                            this.cmbSoilOrganic.Items.Add(pLayer.Name);
-
-                            this.cmbDem.Items.Add(pLayer.Name);
-                            this.cmbC.Items.Add(pLayer.Name);
-                            this.cmbP.Items.Add(pLayer.Name);
-
-                        }
-                        else
-                        {
-                            string strBandName;
-                            for (int i = 0; i < pRasterBandColection.Count; i++)
-                            {
-                                listRasterDataset.Add((IGeoDataset)pRasterBandColection.Item(i).RasterDataset);
-                                if (pLayer.Name.Length < 15)
-                                {
-                                    strBandName = pLayer.Name + "_" + pRasterBandColection.Item(i).Bandname;
-                                }
-                                else
-                                {
-                                    strBandName = pLayer.Name.Substring(0, 10) + "..." + "_" + pRasterBandColection.Item(i).Bandname;
-                                }
-                                this.cmbR.Items.Add(strBandName);
-                                this.cmbSoilClay.Items.Add(strBandName);
-                                this.cmbSoilSand.Items.Add(strBandName);
-                                this.cmbSoilSlit.Items.Add(strBandName);
-                                this.cmbSoilOrganic.Items.Add(strBandName);
-                                this.cmbDem.Items.Add(strBandName);
-                                this.cmbC.Items.Add(strBandName);
-                                this.cmbP.Items.Add(strBandName);
-                            }
-                        }
-                        this.cmbR.SelectedIndex = 0;
-                        this.cmbSoilClay.SelectedIndex = 0;
-                        this.cmbSoilSand.SelectedIndex = 0;
-                        this.cmbSoilSlit.SelectedIndex = 0;
-                        this.cmbSoilOrganic.SelectedIndex = 0;
-                        this.cmbDem.SelectedIndex = 0;
-                        this.cmbC.SelectedIndex = 0;
-                        this.cmbP.SelectedIndex = 0;
+                        sR2 = sR2 + strExp + "+";
+                    }
+                    else
+                    {
+                        sR2 = sR2 + strExp;
                     }
                 }
+                sR3 = sR2;
+                sCalR.expression = sR3;
+                sR = Temfile + "\\CalR.tif";
+                sCalR.output_raster = sR;
+                GP.Execute(sCalR, null);
+                this.rtxtState.AppendText("降水侵蚀因子R计算成功，准备计算参数K...\n");
+                this.rtxtState.ScrollToCaret();
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("请先添加数据！", "提示", MessageBoxButtons.OK);
-            }
-        }
 
+            //2计算参数K
+            sK = "(0.2 + 0.3 * Exp(-0.0256 *" + "\"" + txtSoilSand.Text + "\"" + "* (1.0 - " + "\"" + txtSoilSlit.Text + "\"" + " / 100.0))) * Power((" + "\"" + txtSoilSlit.Text + "\"" + " * 1.0 / (" + "\"" + txtSoilClay.Text + "\"" + " * 1.0 + " + "\"" + txtSoilSlit.Text + "\"" + " * 1.0)), 0.3) * (1.0 - 0.25 * " + "\"" + txtSoilOrganic.Text + "\"" + " * 0.58 / (" + "\"" + txtSoilOrganic.Text + "\"" + " * 0.58 + Exp(3.72 - 2.95 * " + "\"" + txtSoilOrganic.Text + "\"" + " * 0.58))) * (1.0 - (0.7 * (1.0 - " + "\"" + txtSoilSand.Text + "\"" + " / 100.0)) / ((1.0 - " + "\"" + txtSoilSand.Text + "\"" + " / 100.0) + Exp(-5.51 + 22.9 * (1.0 - " + "\"" + txtSoilSand.Text + "\"" + " / 100.0))))";
+            sCalK.expression = sK;
+            CalKpath = Temfile + "\\CalK.tif";
+            sCalK.output_raster = CalKpath;
+            GP.Execute(sCalK, null);
+            this.rtxtState.AppendText("土壤可蚀性因子K计算成功...\n");
+            this.rtxtState.ScrollToCaret();
+            this.rtxtState.AppendText("准备计算地形因子LS...\n");
+            this.rtxtState.ScrollToCaret();
+            //3计算参数LS
+            //Fill Dem
+            this.rtxtState.AppendText("开始填充洼地...\n");
+            this.rtxtState.ScrollToCaret();
+            demFill.in_surface_raster = txtDem.Text;
+            demFill.out_surface_raster = Temfile + "\\demFill.tif";
+            GP.Execute(demFill, null);
+            // cal FlowDirection
+            this.rtxtState.AppendText("开始计算流向...\n");
+            this.rtxtState.ScrollToCaret();
+            Filldec.in_surface_raster = Temfile + "\\demFill.tif";
+            Filldec.out_flow_direction_raster = Temfile + "\\FillDec.tif";
+            GP.Execute(Filldec, null);
+            //cal FlowAccumulation
+            this.rtxtState.AppendText("开始计算流量...\n");
+            this.rtxtState.ScrollToCaret();
+            Filldec.in_surface_raster = Temfile + "\\FillDec.tif";
+            FlowAcc = Temfile + "\\FlowAcc.tif";
+            Filldec.out_flow_direction_raster = FlowAcc;
+            GP.Execute(Filldec, null);
+
+            //先计算坡度
+            this.rtxtState.AppendText("开始计算坡度...\n");
+            this.rtxtState.ScrollToCaret();
+            slo.in_raster = txtDem.Text;
+            slo.output_measurement = "DEGREE";
+            slo.z_factor = 1;
+            string sRoad1 = Temfile + "\\Slope.tif";
+            slo.out_raster = sRoad1;
+            GP.Execute(slo, null);//坡度计算
+            //cal S
+            sS = "Con(" + "\"" + sRoad1 + "\"" + " < 5,10.8 * Sin(" + "\"" + sRoad1 + "\"" + " * 3.14 / 180) + 0.03,Con(" + "\"" + sRoad1 + "\"" + " >= 10,21.9 * Sin(" + "\"" + sRoad1 + "\"" + " * 3.14 / 180) - 0.96,16.8 * Sin(" + "\"" + sRoad1 + "\"" + " * 3.14 / 180) - 0.5))";
+            sCals.expression = sS;
+            Calspath = Temfile + "\\CalS.tif";
+            sCals.output_raster = Calspath;
+            GP.Execute(sCals, null);
+            //cal m
+            sM = "Con(" + "\"" + sRoad1 + "\"" + " <= 1,0.2,Con(" + "\"" + sRoad1 + "\"" + " <= 3,0.3,Con(" + "\"" + sRoad1 + "\"" + " <= 5,0.4,0.5)))";
+            sCalm.expression = sM;
+            Calmpath = Temfile + "\\CalM.tif";
+            sCalm.output_raster = Calmpath;
+            GP.Execute(sCalm, null);
+            //cal ls
+            sLs = "\"" + Calspath + "\"" + " * Power((" + "\"" + CalKpath + "\"" + " * " + this.txtCellSize.Text + " / 22.1)," + "\"" + Calmpath + "\"" + ")";
+            sCalLS.expression = sLs;
+            Callspath = Temfile + "\\CalLS.tif";
+            sCalm.output_raster = Calmpath;
+            sCalLS.output_raster = Callspath;
+            GP.Execute(sCalLS, null);
+            this.rtxtState.AppendText("地形因子LS计算成功...\n");
+            this.rtxtState.ScrollToCaret();
+
+            //4计算参数C
+            if (rbtnVegCover.Checked)
+            {
+                CalCpath = txtC.Text;
+                this.rtxtState.AppendText("地表覆盖因子C读取成功...\n");
+                this.rtxtState.ScrollToCaret();
+            }
+            else
+            {
+                this.rtxtState.AppendText("准备计算地表覆盖因子C...\n");
+                this.rtxtState.ScrollToCaret();
+                //计算NDVI最小值
+                //NDVIMin.in_raster = txtC.Text;
+                //CalKpath = txtDem.Text + "/CalK.tif";
+                //NDVIMin.property_type = "MINIMUM";
+                //GP.Execute(sCalK, null);
+                double dMin = 0;
+                IGeoProcessor2 gp = new GeoProcessorClass();
+                gp.OverwriteOutput = true;
+                // Create a variant array to hold the parameter values.
+                IVariantArray parameters2 = new VarArrayClass();
+                IGeoProcessorResult result = new GeoProcessorResultClass();
+                // Set parameter values.
+                parameters2.Add(txtC.Text);
+                parameters2.Add("MINIMUM");
+                result = gp.Execute("GetRasterProperties_management", parameters2, null);
+                dMin = (double)result.ReturnValue;
+
+                //计算NDVI最大值
+                double dMax = 0;
+                IGeoProcessor2 gp2 = new GeoProcessorClass();
+                gp2.OverwriteOutput = true;
+                // Create a variant array to hold the parameter values.
+                IVariantArray parameters3 = new VarArrayClass();
+                IGeoProcessorResult result3 = new GeoProcessorResultClass();
+                // Set parameter values.
+                parameters3.Add(txtC.Text);
+                parameters3.Add("MAXIMUM");
+                result3 = gp2.Execute("GetRasterProperties_management", parameters3, null);
+                dMax = (double)result3.ReturnValue;
+
+                //最后计算C
+                sC = "(" + "\"" + txtC.Text + "\"" + " - " + dMin + ") / (" + dMax + " - " + dMin + ")";
+                sCalC.expression = sC;
+                CalCpath = Temfile + "\\CalC.tif";
+                sCalC.output_raster = CalCpath;
+                GP.Execute(sCalC, null);
+                this.rtxtState.AppendText("地表覆盖因子C计算成功...\n");
+                this.rtxtState.ScrollToCaret();
+            }
+
+
+            //5计算P
+            sP = txtP.Text;
+            this.rtxtState.AppendText("读取水土保持措施因子P...\n");
+            this.rtxtState.ScrollToCaret();
+            //最后开始计算A=R*K*LS*C*P
+            this.rtxtState.AppendText("准备计算水土流失方程...\n");
+            this.rtxtState.ScrollToCaret();
+            sA = "\"" + sR + "\"" + " * " + "\"" + CalKpath + "\"" + " * " + "\"" + Callspath + "\"" + " * (1 - " + "\"" + CalCpath + "\"" + ") * " + "\"" + sP + "\"";
+            sCalA.expression = sA;
+
+            sCalA.output_raster = txtSavePath.Text;
+            GP.Execute(sCalA, null);
+            //删除临时文件夹
+            string deleteFile = Temfile;
+            DeleteFolder(deleteFile);
+            this.rtxtState.AppendText("计算成功，已将结果成功保存...\n");
+            this.rtxtState.ScrollToCaret();
+        }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void btnOK_Click(object sender, EventArgs e)
-        {
-            if (this.pMap.LayerCount<= 0)
-            {
-                MessageBox.Show("请先在地图中加载要操作的栅格图像.");
-                return;
-            }
-            IRasterLayer pRsL= calWSCons(this.txtSavePath.Text);
-            if (pRsL != null)
-            {
-                pMap.AddLayer(pRsL);
-                MessageBox.Show("计算完毕！");
-            }
-        }
-
-        private IRasterLayer calWSCons(string  _outPath)
-        {
-            //绑定栅格到 pMapAlgebraOp
-            try
-            {
-                if (pMapAlgebraOp==null)
-                {
-                    pMapAlgebraOp = new RasterMapAlgebraOpClass();
-                }
-                string strExp = "";
-                string sRainPath = "";
-
-                //是直接用降雨侵蚀力数据还是降雨数据计算
-                IRaster pRasterR = null; 
-                if (rbtnR.Checked)
-                {
-                    pRasterR = (pMap.get_Layer(LayerOprate.getLayerIndexByName(pMap, this.cmbR.Text)) as IRasterLayer).Raster;
-                    pMapAlgebraOp.BindRaster(pRasterR as IGeoDataset, "R");
-                }
-                else
-                {
-                    sRainPath = this.txtPcpPath.Text;
-                    //
-                    IWorkspaceFactory pWsF = new RasterWorkspaceFactoryClass();
-                    IRasterWorkspace pRWs;
-                    IRasterDataset pRDs = new RasterDatasetClass();
-                    IRasterLayer pRLyr = new RasterLayerClass();
-                    
-                    pRWs = pWsF.OpenFromFile(sRainPath, 0) as IRasterWorkspace;
-                    string sFileName="";
-                    for (int i = 1; i < 13; i++)
-                    {
-                        sFileName = this.txtPcpPrefix.Text + i.ToString() + this.txtPcpSuffix.Text;
-                        pRDs = pRWs.OpenRasterDataset(sFileName);
-                        pMapAlgebraOp.BindRaster(pRDs as IGeoDataset, sFileName);
-                        strExp = strExp + "[" + sFileName + "] + ";
-                    }
-                    //cal total pcp
-                    strExp = strExp.TrimEnd("+ ".ToCharArray());
-                    IGeoDataset pGeoDsPcp = pMapAlgebraOp.Execute(strExp);
-                    pMapAlgebraOp.BindRaster(pGeoDsPcp, "Pcp");
-                        
-                    //cal Ri
-                    strExp = "";
-                    string sFileNameE = "",sDsName="",strExpR="";
-                    for (int i = 1; i < 13; i++)
-                    {
-                        sFileName = this.txtPcpPrefix.Text + i.ToString() + this.txtPcpSuffix.Text;
-                        sFileNameE="["+sFileName+"]";
-                        strExp = "1.735 * pow(10,1.5 * log10((" + sFileNameE + " * " + sFileNameE + ") / [Pcp]) - 0.08188)";
-                        IGeoDataset pGeoDsRi = pMapAlgebraOp.Execute(strExp);
-                        sDsName = "Pcp" + i.ToString();
-                        pMapAlgebraOp.BindRaster(pGeoDsRi, sDsName);
-                        pMapAlgebraOp.UnbindRaster(sFileName);
-                        strExpR = strExpR + "[" + sDsName + "] + ";
-                    }
-                    //cal R
-                    strExpR = strExpR.TrimEnd("+ ".ToCharArray());
-                    IGeoDataset pGeoDsR = pMapAlgebraOp.Execute(strExpR);
-                    pMapAlgebraOp.BindRaster(pGeoDsR, "R");
-                    for (int i = 1; i < 13; i++)
-                    {
-                        sDsName = "Pcp" + i.ToString();
-                        pMapAlgebraOp.UnbindRaster(sDsName);
-                    }
-                }
-
-                //计算K因子
-                IRaster pRasterSclay = (pMap.get_Layer(LayerOprate.getLayerIndexByName(pMap, this.cmbSoilClay.Text)) as IRasterLayer).Raster;
-                pMapAlgebraOp.BindRaster(pRasterSclay as IGeoDataset, "clay");
-
-                IRaster pRasterSsand = (pMap.get_Layer(LayerOprate.getLayerIndexByName(pMap, this.cmbSoilSand.Text)) as IRasterLayer).Raster;
-                pMapAlgebraOp.BindRaster(pRasterSsand as IGeoDataset, "sand");
-
-                IRaster pRasterSslit = (pMap.get_Layer(LayerOprate.getLayerIndexByName(pMap, this.cmbSoilSlit.Text)) as IRasterLayer).Raster;
-                pMapAlgebraOp.BindRaster(pRasterSslit as IGeoDataset, "slit");
-
-                IRaster pRasterSOrg = (pMap.get_Layer(LayerOprate.getLayerIndexByName(pMap, this.cmbSoilOrganic.Text)) as IRasterLayer).Raster;
-                pMapAlgebraOp.BindRaster(pRasterSOrg as IGeoDataset, "org");
-
-                //cal K
-                //K =(0.2 + 0.3 * exp(-0.0256 * soil_sand * (1.0 - soil_silt / 100.0))) * pow((soil_silt * 1.0 / (soil_clay * 1.0 + soil_silt * 1.0)),0.3) * (1.0 - 0.25 * soil_oc / (soil_oc * 1.0 + exp(3.72 - 2.95 * soil_oc))) * (1.0 - (0.7 * ksd) / (ksd + exp(-5.51 + 22.9 * ksd)))
-                strExp = "(0.2 + 0.3 * Exp(-0.0256 * [sand] * (1.0 - [slit] / 100.0))) * Pow(([slit] * 1.0 / ([clay] * 1.0 + [slit] * 1.0)), 0.3) * (1.0 - 0.25 * [org] * 0.58 / ([org] * 0.58 + Exp(3.72 - 2.95 * [org] * 0.58))) * (1.0 - (0.7 * (1.0 - [sand] / 100.0)) / ((1.0 - [sand] / 100.0) + Exp(-5.51 + 22.9 * (1.0 - [sand] / 100.0))))";
-                IGeoDataset pGeoDsK = pMapAlgebraOp.Execute(strExp);
-                pMapAlgebraOp.BindRaster(pGeoDsK, "K");
-                pMapAlgebraOp.UnbindRaster("clay");
-                pMapAlgebraOp.UnbindRaster("sand");
-                pMapAlgebraOp.UnbindRaster("slit");
-                pMapAlgebraOp.UnbindRaster("org");
-
-                //cal L*S
-                IHydrologyOp pHydrologyOp = new RasterHydrologyOpClass();
-                object objZLimit = System.Type.Missing;
-                IRaster pRasterDem = (pMap.get_Layer(LayerOprate.getLayerIndexByName(pMap, this.cmbDem.Text)) as IRasterLayer).Raster;
-                //Fill Dem
-                IGeoDataset pGeoDsDemFill =pHydrologyOp.Fill(pRasterDem as IGeoDataset,ref objZLimit);
-                // cal FlowDirection
-                IGeoDataset pGeoDsFlowDir = pHydrologyOp.Fill(pGeoDsDemFill, ref objZLimit);
-                //cal FlowAccumulation
-                IGeoDataset pGeoDsFlowAcc = pHydrologyOp.Fill(pGeoDsFlowDir, ref objZLimit);
-                pMapAlgebraOp.BindRaster(pGeoDsFlowAcc, "FlowAcc");
-
-                //cal Slope with Deg
-                ISurfaceOp pSurfaceOp = new RasterSurfaceOpClass();
-                object objZFactor = System.Type.Missing;
-                IGeoDataset pGeoDsSlope = pSurfaceOp.Slope(pGeoDsDemFill, esriGeoAnalysisSlopeEnum.esriGeoAnalysisSlopeDegrees, ref objZFactor);
-                // bind raster data "Slope"
-                pMapAlgebraOp.BindRaster(pGeoDsSlope, "Slope");
-                //cal S
-                strExp = "Con([Slope] < 5,10.8 * Sin([Slope] * 3.14 / 180) + 0.03,[Slope] >= 10,21.9 * Sin([Slope] * 3.14 / 180) - 0.96,16.8 * Sin([Slope] * 3.14 / 180) - 0.5)";
-                IGeoDataset pGeoDsS = pMapAlgebraOp.Execute(strExp);
-                pMapAlgebraOp.BindRaster(pGeoDsS, "S");
-
-                //cal m
-                strExp = "Con([Slope] <= 1,0.2,([Slope] > 1 & [Slope] <= 3),0.3,[Slope] >= 5,0.5,0.4)";
-                IGeoDataset pGeoDsM = pMapAlgebraOp.Execute(strExp);
-                pMapAlgebraOp.BindRaster(pGeoDsM, "m");
-                //cal ls
-                strExp = "[S] * Pow(([FlowAcc] * "+this.txtCellSize.Text+" / 22.1),[m])";
-
-                IGeoDataset pGeoDsLS = pMapAlgebraOp.Execute(strExp);
-                pMapAlgebraOp.BindRaster(pGeoDsLS, "LS");
-
-                pMapAlgebraOp.UnbindRaster("m");
-                pMapAlgebraOp.UnbindRaster("S");
-                pMapAlgebraOp.UnbindRaster("Slope");
-                pMapAlgebraOp.UnbindRaster("FlowAcc");
-
-
-                IRaster pRasterC = null;
-                if (rbtnVegCover.Checked)
-                {
-                    pRasterC = (pMap.get_Layer(LayerOprate.getLayerIndexByName(pMap, this.cmbC.Text)) as IRasterLayer).Raster;
-                    pMapAlgebraOp.BindRaster(pRasterC as IGeoDataset, "C");
-                }
-                else
-                {
-                    //cal vegetation cover 
-                    IRaster pRasterNDVI = (pMap.get_Layer(LayerOprate.getLayerIndexByName(pMap, this.cmbC.Text)) as IRasterLayer).Raster;
-                    IRasterBandCollection pRasterBandCollection = pRasterNDVI as IRasterBandCollection;
-                    IRasterBand pRasterBand = pRasterBandCollection.Item(0);
-                    pRasterBand.ComputeStatsAndHist();
-                    IRasterStatistics pRasterStatistics = pRasterBand.Statistics;
-                    double dMax = pRasterStatistics.Maximum;
-                    double dMin = pRasterStatistics.Minimum;
-                    pMapAlgebraOp.BindRaster(pRasterNDVI as IGeoDataset, "NDVI");
-                    if (dMin < 0)
-                    {
-                        dMin = 0;
-                    }
-                    //veg%yr% = (ndvi%yr% - ndvi%yr%min) / (ndvi%yr%max - ndvi%yr%min)
-                    strExp = "([NDVI] - "+dMin+") / ("+dMax +" - "+dMin+")";
-                    IGeoDataset pGeoDsC = pMapAlgebraOp.Execute(strExp);
-                    pMapAlgebraOp.BindRaster(pGeoDsC, "C");
-                    pMapAlgebraOp.UnbindRaster("NDVI");
-                }
-                //计算P因子
-                IRaster pRasterP = (pMap.get_Layer(LayerOprate.getLayerIndexByName(pMap, this.cmbP.Text)) as IRasterLayer).Raster;
-                pMapAlgebraOp.BindRaster(pRasterP as IGeoDataset, "P");
-                if (_outPath != "")
-                {
-                    strExp = _outPath + " = [R] * [K] * [LS] * (1 - [C]) * [P]";
-                }
-                else
-                {
-                    strExp = "[R] * [K] * [LS] * (1 - [C]) * [P]";
-                }
-
-                IGeoDataset pGeoDsSr = pMapAlgebraOp.Execute(strExp);
-                IRaster pOutRaster = pGeoDsSr as IRaster;
-                IRasterLayer pOutRasterLayer = new RasterLayerClass();
-                pOutRasterLayer.CreateFromRaster(pOutRaster);
-                //数据名称
-                //string strOutDir = _outPath.Substring(0, _outPath.LastIndexOf("\\"));
-                int startX = _outPath.LastIndexOf("\\");
-                int endX = _outPath.Length;
-                string sRLyrName = _outPath.Substring(startX + 1, endX - startX - 1);
-                pOutRasterLayer.Name = sRLyrName;
-                pMapAlgebraOp = null;
-                return pOutRasterLayer;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message.ToString());
-                return null;
-            }
-        }
-
-        //栅格重分类
-        private IRasterLayer calMValve(IRaster pInRaster, string sField)
-        {
-            try
-            {
-                if (sField.Trim() == "")
-                    return null;
-                IRasterDescriptor pRD = new RasterDescriptorClass();
-                pRD.Create(pInRaster, null, sField);
-                IReclassOp pReclassOp = new RasterReclassOpClass();
-
-                IGeoDataset pGeodataset = pInRaster as IGeoDataset;
-                IRasterAnalysisEnvironment pEnv = pReclassOp as IRasterAnalysisEnvironment;
-
-                IRasterBandCollection pRsBandCol = pGeodataset as IRasterBandCollection;
-                IRasterBand pRasterBand = pRsBandCol.Item(0);
-                pRasterBand.ComputeStatsAndHist();
-                IRasterStatistics pRasterStatistic = pRasterBand.Statistics;
-                double dMaxValue = pRasterStatistic.Maximum;
-                double dMinValue = pRasterStatistic.Minimum;
-
-                INumberRemap pNumRemap = new NumberRemapClass();
-                //m——常数， 在坡度为 0-7.5; 7.5-12.5; 12.5-17.5; 17.5--22.5; >22.5;
-                //m值分别为： 0.1;0.15;0.2;0.25,0.3
-                //数值扩大了100倍
-                pNumRemap.MapRange(dMinValue, 7.5, 10);
-                pNumRemap.MapRange(7.5, 12.5, 15);
-                pNumRemap.MapRange(12.5, 17.5, 20);
-                pNumRemap.MapRange(17.5, 22.5, 25);
-                pNumRemap.MapRange(22.5, dMaxValue, 30);
-                IRemap pRemap = pNumRemap as IRemap;
-
-                IGeoDataset pGeoDs = new RasterDatasetClass();
-                pGeoDs = pReclassOp.ReclassByRemap(pGeodataset, pRemap, false);
-                IRaster pOutRaster = pGeoDs as IRaster;
-                IRasterLayer pRLayer = new RasterLayerClass();
-                pRLayer.CreateFromRaster(pOutRaster);
-                return pRLayer;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message.ToString());
-                return null;
-            }
-        }
-       
-        //绑定栅格数据到，栅格代数计算的列表中
-        private void setBandName(ComboBox cmb)
-        {
-            pMapAlgebraOp.BindRaster(listRasterDataset[cmb.SelectedIndex], cmb.Text.Trim());
-        }
-        //栅格大小文本框的是否可用
-        private void chkbCellsize_CheckedChanged(object sender, EventArgs e)
-        {
-            txtCellSize.Enabled = chkbCellsize.Checked;
-        }
-        //开打降雨数据的文件夹
-        private void btnOpenPcp_Click(object sender, EventArgs e)
-        {
-            FolderBrowserDialog pFBD = new FolderBrowserDialog();
-            pFBD.Description = "请选择降水栅格数据所在的文件夹";
-            DialogResult pDr = pFBD.ShowDialog();
-            if (pDr == DialogResult.OK)
-            {
-                IWorkspaceFactory pWsF;
-                pWsF = new RasterWorkspaceFactoryClass();
-                if(pWsF.IsWorkspace(pFBD.SelectedPath))
-                {
-                    this.txtPcpPath.Text = pFBD.SelectedPath;
-                }
-                else
-                {
-                    MessageBox.Show("您所选择的路径不含有栅格数据，请重新选择！","提示",MessageBoxButtons.OK,MessageBoxIcon.Warning);
-                    return;
-                }       
-            }
-        }
-
         private void btnSavePath_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveDlg = new SaveFileDialog();
             saveDlg.CheckPathExists = true;
-            saveDlg.Filter = "所有文件(*.*)|*.*";
+            saveDlg.Filter = "(*.tif)|*.tif|(*.*)|*.*";
             saveDlg.OverwritePrompt = true;
             saveDlg.Title = "保存";
             saveDlg.RestoreDirectory = true;
-            saveDlg.FileName = "SWCons";
+            saveDlg.FileName = "SWCons.tif";
 
             DialogResult dr = saveDlg.ShowDialog();
             if (dr == DialogResult.OK)
                 this.txtSavePath.Text = saveDlg.FileName;
+        }
+
+        private void chkbCellsize_CheckedChanged(object sender, EventArgs e)
+        {
+        txtCellSize.Enabled = chkbCellsize.Checked;
         }
 
         private void rbtnPcp_CheckedChanged(object sender, EventArgs e)
@@ -444,17 +521,26 @@ namespace EcoRedLine
             this.btnOpenPcp.Enabled = ((RadioButton)sender).Checked;
             this.txtPcpPrefix.Enabled = ((RadioButton)sender).Checked;
             this.txtPcpSuffix.Enabled = ((RadioButton)sender).Checked;
+            this.btnYear.Enabled = ((RadioButton)sender).Checked;
+            this.txtYear.Enabled = ((RadioButton)sender).Checked;
         }
-
-        public string dSclay { get; set; }
-
-        private void cmbDem_SelectedIndexChanged(object sender, EventArgs e)
+        //删除临时文件夹函数
+        public void DeleteFolder(string deleteDirectory)
         {
-            IRaster pRasterDem = (pMap.get_Layer(LayerOprate.getLayerIndexByName(pMap, this.cmbDem.Text)) as IRasterLayer).Raster;
-            IRasterProps pRasterProps = (IRasterProps)pRasterDem;
-            double dX = pRasterProps.MeanCellSize().X;
-            double dY = pRasterProps.MeanCellSize().Y;
-            this.txtCellSize.Text = ((dX + dY) / 2).ToString();
-        }
+            if (Directory.Exists(deleteDirectory))
+            {
+                foreach (string deleteFile in Directory.GetFileSystemEntries(deleteDirectory))
+                {
+                    if (File.Exists(deleteFile))
+                        File.Delete(deleteFile);
+                    else
+                        DeleteFolder(deleteFile);
+                }
+                Directory.Delete(deleteDirectory);
+            }
+        }   
+        
+
+
     }
 }

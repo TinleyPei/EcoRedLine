@@ -59,7 +59,6 @@ namespace EcoRedLine.Properties {
                 resourceCulture = value;
             }
         }
-<<<<<<< HEAD
         
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
@@ -80,7 +79,5 @@ namespace EcoRedLine.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-=======
->>>>>>> origin/master
     }
 }

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ESRI.ArcGIS.Carto;
 using MyPluginEngine;
+using ESRI.ArcGIS.Controls;
 
 namespace EcoRedLine
 {
@@ -14,6 +15,7 @@ namespace EcoRedLine
         private MyPluginEngine.IApplication hk;
         private System.Drawing.Bitmap m_hBitmap;
         private ESRI.ArcGIS.SystemUI.ICommand cmd = null;
+        private IPageLayoutControl _PageLayoutControl = null;
         frmWaterSoilConservation pfrmWaterSoilConservation;
 
         public frmWaterSoilConservationCmd()
@@ -74,7 +76,7 @@ namespace EcoRedLine
         public void OnClick()
         {
             //System.Windows.Forms.MessageBox.Show("正在开发中！");
-            pfrmWaterSoilConservation = new frmWaterSoilConservation();
+            pfrmWaterSoilConservation = new frmWaterSoilConservation(_PageLayoutControl);
             pfrmWaterSoilConservation.ShowDialog();
         }
 
@@ -83,7 +85,8 @@ namespace EcoRedLine
             if (hook != null)
             {
                 this.hk = hook;
-                pfrmWaterSoilConservation = new frmWaterSoilConservation();
+                this._PageLayoutControl = hk.PageLayoutControl as IPageLayoutControl;
+                pfrmWaterSoilConservation = new frmWaterSoilConservation(_PageLayoutControl);
                 pfrmWaterSoilConservation.Visible = false;
             }
         }

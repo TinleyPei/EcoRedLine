@@ -52,20 +52,42 @@ C:\Users\41866\Desktop\EcoRedLine\obj\Debug\EcoRedLine.frmWaterSoilConservation.
 C:\Users\41866\Desktop\EcoRedLine\obj\Debug\EcoRedLine.csproj.GenerateResource.Cache
 C:\Users\41866\Desktop\EcoRedLine\obj\Debug\EcoRedLine.dll
 C:\Users\41866\Desktop\EcoRedLine\obj\Debug\EcoRedLine.pdb
-C:\Users\41866\Desktop\EcoRedLine\obj\Debug\EcoRedLine.csprojResolveAssemblyReference.cache
 C:\Users\41866\Desktop\EcoRedLine\obj\Debug\EcoRedLine.Properties.Resources.resources
-<<<<<<< HEAD
-C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.frmBiodiversity.resources
-C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.frmFlood.resources
-C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.frmGeoHazards.resources
-C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.frmTerrain.resources
-C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.frmWaterConervation.resources
-C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.frmWaterSoilConservation.resources
-C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.Properties.Resources.resources
-C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.csproj.GenerateResource.Cache
-C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.dll
-C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\bin\Debug\EcoRedLine.dll
-C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\bin\Debug\EcoRedLine.pdb
-C:\Users\tangmeng\Documents\Tencent Files\1508157954\FileRecv\EcoRedLine\obj\Debug\EcoRedLine.pdb
-=======
->>>>>>> origin/master
+C:\Users\tangmeng\Desktop\水土保持、地质灾害\EcoRedLine-myself\obj\Debug\EcoRedLine.frmBiodiversity.resources
+C:\Users\tangmeng\Desktop\水土保持、地质灾害\EcoRedLine-myself\obj\Debug\EcoRedLine.frmFlood.resources
+C:\Users\tangmeng\Desktop\水土保持、地质灾害\EcoRedLine-myself\obj\Debug\EcoRedLine.frmGeoHazards.resources
+C:\Users\tangmeng\Desktop\水土保持、地质灾害\EcoRedLine-myself\obj\Debug\EcoRedLine.frmTerrain.resources
+C:\Users\tangmeng\Desktop\水土保持、地质灾害\EcoRedLine-myself\obj\Debug\EcoRedLine.frmWaterConervation.resources
+C:\Users\tangmeng\Desktop\水土保持、地质灾害\EcoRedLine-myself\obj\Debug\EcoRedLine.frmWaterSoilConservation.resources
+C:\Users\tangmeng\Desktop\水土保持、地质灾害\EcoRedLine-myself\obj\Debug\EcoRedLine.Properties.Resources.resources
+C:\Users\tangmeng\Desktop\水土保持、地质灾害\EcoRedLine-myself\obj\Debug\EcoRedLine.csproj.GenerateResource.Cache
+C:\Users\tangmeng\Desktop\水土保持、地质灾害\EcoRedLine-myself\obj\Debug\EcoRedLine.dll
+C:\Users\tangmeng\Desktop\水土保持、地质灾害\EcoRedLine-myself\obj\Debug\EcoRedLine.pdb
+C:\Users\tangmeng\Desktop\水土保持、地质灾害\EcoRedLine-myself\bin\Debug\EcoRedLine.dll
+C:\Users\tangmeng\Desktop\水土保持、地质灾害\EcoRedLine-myself\bin\Debug\EcoRedLine.pdb
+C:\Users\tangmeng\Desktop\水土保持、地质灾害\EcoRedLine-myself\obj\Debug\EcoRedLine.csprojResolveAssemblyReference.cache
+D:\Working Document\EcoRedLine-myself\bin\Debug\EcoRedLine.dll
+D:\Working Document\EcoRedLine-myself\bin\Debug\EcoRedLine.pdb
+D:\Working Document\EcoRedLine-myself\obj\Debug\EcoRedLine.frmBiodiversity.resources
+D:\Working Document\EcoRedLine-myself\obj\Debug\EcoRedLine.frmFlood.resources
+D:\Working Document\EcoRedLine-myself\obj\Debug\EcoRedLine.frmGeoHazards.resources
+D:\Working Document\EcoRedLine-myself\obj\Debug\EcoRedLine.frmTerrain.resources
+D:\Working Document\EcoRedLine-myself\obj\Debug\EcoRedLine.frmWaterConervation.resources
+D:\Working Document\EcoRedLine-myself\obj\Debug\EcoRedLine.frmWaterSoilConservation.resources
+D:\Working Document\EcoRedLine-myself\obj\Debug\EcoRedLine.Properties.Resources.resources
+D:\Working Document\EcoRedLine-myself\obj\Debug\EcoRedLine.csproj.GenerateResource.Cache
+D:\Working Document\EcoRedLine-myself\obj\Debug\EcoRedLine.dll
+D:\Working Document\EcoRedLine-myself\obj\Debug\EcoRedLine.pdb
+D:\Working Document\EcoRedLine\bin\Debug\EcoRedLine.dll
+D:\Working Document\EcoRedLine\bin\Debug\EcoRedLine.pdb
+D:\Working Document\EcoRedLine\obj\Debug\EcoRedLine.csprojResolveAssemblyReference.cache
+D:\Working Document\EcoRedLine\obj\Debug\EcoRedLine.frmBiodiversity.resources
+D:\Working Document\EcoRedLine\obj\Debug\EcoRedLine.frmFlood.resources
+D:\Working Document\EcoRedLine\obj\Debug\EcoRedLine.frmGeoHazards.resources
+D:\Working Document\EcoRedLine\obj\Debug\EcoRedLine.frmTerrain.resources
+D:\Working Document\EcoRedLine\obj\Debug\EcoRedLine.frmWaterConervation.resources
+D:\Working Document\EcoRedLine\obj\Debug\EcoRedLine.frmWaterSoilConservation.resources
+D:\Working Document\EcoRedLine\obj\Debug\EcoRedLine.Properties.Resources.resources
+D:\Working Document\EcoRedLine\obj\Debug\EcoRedLine.csproj.GenerateResource.Cache
+D:\Working Document\EcoRedLine\obj\Debug\EcoRedLine.dll
+D:\Working Document\EcoRedLine\obj\Debug\EcoRedLine.pdb

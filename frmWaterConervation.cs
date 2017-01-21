@@ -21,25 +21,31 @@ namespace EcoRedLine
 {
     public partial class frmWaterConervation : DevComponents.DotNetBar.OfficeForm
     {
-        private IMap pMap;
-        private IMapAlgebraOp pMapAlgebraOp = null;
-        private List<IGeoDataset> listRasterDataset = new List<IGeoDataset>();
+        private IPageLayoutControl _PageLayoutControl = null;
 
-        public frmWaterConervation()
+        public frmWaterConervation(IPageLayoutControl pPageLayoutControl)
         {
             InitializeComponent();
-            //禁用最大化
-            this.MaximizeBox = false;
-            //禁用最小化
-            this.MinimizeBox = false;
+            this._PageLayoutControl = pPageLayoutControl;
 
-            tb_raininput.Text = "C:\\Users\\41866\\Desktop\\云南系统\\test\\rain.tif";
-            tb_suninput.Text = "C:\\Users\\41866\\Desktop\\云南系统\\test\\sun.tif";
-            tb_tminput.Text = "C:\\Users\\41866\\Desktop\\云南系统\\test\\ta_Resample.tif";
-            tb_luinput.Text = "C:\\Users\\41866\\Desktop\\云南系统\\test\\LandUse.tif";
-            tb_wcoutput.Text = "C:\\Users\\41866\\Desktop\\云南系统\\test\\waterConervations.tif";
+
+            //禁用Glass主题
+            this.EnableGlass = false;
+            //不显示最大化最小化按钮
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            //去除图标
+            this.ShowIcon = false;
+
+            tb_raininput.Text = System.Environment.CurrentDirectory + "\\Data\\EcoRedLine\\rain.tif";
+            tb_suninput.Text = System.Environment.CurrentDirectory + "\\Data\\EcoRedLine\\sun.tif";
+            tb_tminput.Text = System.Environment.CurrentDirectory + "\\Data\\EcoRedLine\\ta_Resample.tif";
+            tb_luinput.Text = System.Environment.CurrentDirectory + "\\Data\\EcoRedLine\\LandUse.tif";
+            tb_wcoutput.Text = System.Environment.CurrentDirectory + "\\Data\\EcoRedLine\\waterConervations.tif";
 
         }
+
 
 
         private void bt_raininput_Click(object sender, EventArgs e)
@@ -132,6 +138,43 @@ namespace EcoRedLine
 
         private void bt_ok_Click(object sender, EventArgs e)
         {
+            //判断输入路径是否正确
+            #region
+            try
+            {
+                if (!File.Exists(tb_raininput.Text))
+                {
+                    MessageBox.Show("平均降水量数据输入路径不正确或文件被占用，请重新输入路径！", "提示", MessageBoxButtons.OK);
+                    return;
+                }
+                if (!File.Exists(tb_suninput.Text))
+                {
+                    MessageBox.Show("平均日照时长数据输入路径不正确或文件被占用，请重新输入路径！", "提示", MessageBoxButtons.OK);
+                    return;
+                }
+                if (!File.Exists(tb_tminput.Text))
+                {
+                    MessageBox.Show("平均温度数据输入路径不正确或文件被占用，请重新输入路径！", "提示", MessageBoxButtons.OK);
+                    return;
+                }
+                if (!File.Exists(tb_luinput.Text))
+                {
+                    MessageBox.Show("土地利用类型数据输入路径不正确或文件被占用，请重新输入路径！", "提示", MessageBoxButtons.OK);
+                    return;
+                }
+
+            }
+         catch (Exception ex)
+            { 
+                MessageBox.Show("设置路径不合法，请检查！");
+                return;
+            }            
+            #endregion
+
+
+            //水源涵养生态红线
+            #region
+            object sev = null;
             ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator rc = new ESRI.ArcGIS.SpatialAnalystTools.RasterCalculator();
             Geoprocessor gp = new Geoprocessor();
             gp.OverwriteOutput = true;
@@ -223,11 +266,7 @@ namespace EcoRedLine
                 rc.expression = " 1 + " + "(\"" + w + "\" *  \"" + pet + "\" / (\"" + tb_raininput.Text + "\") + \"" + tb_raininput.Text + "\" / \"" + pet + "\")";
                 rc.output_raster = et2_t;
                 gp.Execute(rc, null);
-<<<<<<< HEAD
                 rc.expression = "Con(\"" + et2_t + "\"" + " != 0 ,\"" + et2_t + "\")";
-=======
-                rc.expression = "\"" + et2_t + "\"" + " != 0";
->>>>>>> origin/master
                 rc.output_raster = et2;
                 gp.Execute(rc, null);
                 rc.expression = "\"" + et1 + "\" / \"" + et2 + "\"";
@@ -245,10 +284,6 @@ namespace EcoRedLine
 
 
                 //删除临时文件
-
-
-
-
                 if (tb_state.Text == "水源涵养量计算完成！")
                 {
                     string[] files = Directory.GetFiles(System.IO.Path.GetDirectoryName(tb_wcoutput.Text), System.IO.Path.GetFileNameWithoutExtension(tb_wcoutput.Text)+"*");
@@ -256,119 +291,47 @@ namespace EcoRedLine
                     {
                         if (System.IO.Path.GetFileNameWithoutExtension(tb_wcoutput.Text) != System.IO.Path.GetFileNameWithoutExtension(file))
                             File.Delete(file);
-                    } 
+                    }
 
                 }
 
+                #endregion
 
-<<<<<<< HEAD
-                //IMapDocument pMapDocument = new MapDocumentClass();
-                //pMapDocument.Open("模板地形地貌.mxd"); //打开本地的“模板地形地貌.mxd”地图文档，用来操作改mxd文件
-                //IMap pMap = pMapDocument.get_Map(0);
-                //IMapLayers pMapLayer = pMap as IMapLayers;
-                //IRasterLayer pRasterLayer = new RasterLayerClass();
-                //IWorkspaceFactory rasterWorkspaceFactory = new RasterWorkspaceFactoryClass();
-                //IRasterWorkspace rasterWorkspace = (IRasterWorkspace)rasterWorkspaceFactory.OpenFromFile(System.IO.Path.GetDirectoryName(tb_wcoutput.Text), 0);
-                //IRasterDataset pRasterDataset1 = rasterWorkspace.OpenRasterDataset("大理市.tif");  //打开"优化建设区.tif"为栅格图的文件名
-                //pRasterLayer.CreateFromDataset(pRasterDataset1);    //创建    
-                //pRasterLayer = pMapLayer.get_Layer(0) as IRasterLayer;
-                //pRasterLayer.CreateFromDataset(pRasterDataset1);
-                //pMapDocument.Save(true, true);//保存更改完路径后的mxd文件模板地形地貌2
+            //将结果加载显示
+            #region
+                string mxfile=System.Environment.CurrentDirectory + "\\Data\\EcoRedLine\\水源涵养生态红线划分.mxd";
+                IMapDocument pMapDocument = new MapDocumentClass();
+                pMapDocument.Open(mxfile); //打开本地的地图文档，用来操作改mxd文件
+                IMap pMap = pMapDocument.get_Map(0);
+                IMapLayers pMapLayer = pMap as IMapLayers;
+                IRasterLayer pRasterLayer = new RasterLayerClass();
+                IWorkspaceFactory rasterWorkspaceFactory = new RasterWorkspaceFactoryClass();
+                IRasterWorkspace rasterWorkspace = (IRasterWorkspace)rasterWorkspaceFactory.OpenFromFile(System.IO.Path.GetDirectoryName(tb_wcoutput.Text), 0);
+                IRasterDataset pRasterDataset1 = rasterWorkspace.OpenRasterDataset("waterConervations.tif");  //打开栅格图的文件名
+                pRasterLayer.CreateFromDataset(pRasterDataset1);    //创建    
+                pRasterLayer = pMapLayer.get_Layer(0) as IRasterLayer;
+                pRasterLayer.CreateFromDataset(pRasterDataset1);
+                pMapDocument.Save(true, true);//保存更改完路径后的mxd文件
+
+                _PageLayoutControl.LoadMxFile(mxfile);
+                _PageLayoutControl.Extent = _PageLayoutControl.FullExtent;
+                _PageLayoutControl.ZoomToWholePage();
 
 
+            #endregion
 
 
-
-=======
->>>>>>> origin/master
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "提示", MessageBoxButtons.OK);
+                MessageBox.Show(gp.GetMessages(ref sev), "提示", MessageBoxButtons.OK);
             }
 
 
         }
 
-        private void frmWaterConervation_Load(object sender, EventArgs e)
-        {
-
-        }
 
 
-
-        //GP工具箱另一种调用方式
-        //string expression="\" C:\\Users\\41866\\Desktop\\云南系统\\test\\sun.tif\" / 20";
-        //pVarArray.Add(expression);
-        //pVarArray.Add(tb_wcoutput.Text);
-        //gp.Execute("RasterCalculator", pVarArray,null);
-        //MessageBox.Show("请先添加数据！", "提示", MessageBoxButtons.OK);
-
-
-
-        //获取栅格最大值
-        //public void  GetMaxPixelValue(string fullfilepath)
-        //{
-        //    IRasterLayer rasterLayer = new RasterLayerClass();
-        //    rasterLayer.CreateFromFilePath(fullfilepath); // fullfilepath指存在本地的栅格文件路径
-        //    IRaster pRaster = rasterLayer.Raster;
-        //    IRaster2 pRaster2 = pRaster as IRaster2;
-        //    IRasterProps pRasterProps = pRaster as IRasterProps;
-   
-        //     //获取图层的行列值   
-        //     int Height = pRasterProps.Height;
-        //     int Width = pRasterProps.Width;
-   
-        //     //定义并初始化数组，用于存储栅格内所有像员像素值
-        //     double[ ,] PixelValue = new double[Height, Width];
-        //     thisRasterLayer = rasterLayer;
-   
-        //     System.Array pixels;
-   
-        //     //定义RasterCursor初始化，参数设为null，内部自动设置PixelBlock大小
-        //     IRasterCursor pRasterCursor = pRaster2.CreateCursorEx(null);
-   
-        //     //用于存储PixelBlock的长宽
-        //     long blockwidth = 0;
-        //     long blockheight = 0;
-   
-        //     IPixelBlock3 pPixelBlock3;
-   
-        //     try
-        //     {
-        //         do
-        //         {
-        //             //获取Cursor的左上角坐标
-        //             int left = (int)pRasterCursor.TopLeft.X;
-        //             int top = (int)pRasterCursor.TopLeft.Y;
-   
-        //             pPixelBlock3 = pRasterCursor.PixelBlock as IPixelBlock3;
-   
-        //             blockheight = pPixelBlock3.Height;
-        //             blockwidth = pPixelBlock3.Width;
-        //             //pPixelBlock3.Mask(255);
-   
-        //                    pixels = (System.Array)pPixelBlock3.get_PixelData(0);
-   
-        //                    //获取该Cursor的PixelBlock中像素的值
-        //                    for (int i = 0; i < blockheight; i++)
-        //                    {
-        //                        for (int j = 0; j < blockwidth; j++)
-        //                        {
-        //                            //一定要注意，pixels中的数组排序为[Width,Height]
-        //                            PixelValue[top + i, left + j] = Convert.ToDouble(pixels.GetValue(j, i));
-        //                        }
-        //                    }
-        //                }
-        //                while (pRasterCursor.Next() == true);
-   
-        //                MessageBox.Show("完成遍历！");
-        //            }
-        //            catch(Exception ex)
-        //            {
-        //                MessageBox.Show(ex.Message);
-        //            }            
-        //        }
 
     }
 }
